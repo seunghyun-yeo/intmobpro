@@ -54,8 +54,13 @@ int main(int argc, char *argv[])
 	addr.sin_family = AF_INET;
 	addr.sin_port = htons (port_num);
 	inet_pton(AF_INET, argv[1], &addr.sin_addr);
-
+	ret=-1;
+	printf("try connect to %s:%s\n",argv[1],argv[2]);
+	while(ret==-1)
+	{
 	ret = connect(fd_sock, (struct sockaddr *)&addr, sizeof(addr));
+	}
+	printf("connection established\n");
 	if (ret == -1) {
 		perror("connect");
 		close(fd_sock);
@@ -98,12 +103,6 @@ void * mydaemon(void * args)
 	struct sockaddr_in addr;
 	int len;
 
-	// arg parsing
-	/*if (argc != 2) {
-	  printf("usage: srv port\n");
-	  return 0;
-	  }*/
-	//port_num = atoi(argv[1]);
 	// socket creation
 	port_num = 8179;
 
