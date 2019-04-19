@@ -21,26 +21,12 @@ void*  mydaemon(void *);
 
 char buffer[1024];
 char r_buffer[1024];
-/*
-int socket_recv(int socket, char* buffer, int size)
-{
-	int total;
-	int received;
 
-	assert(buffer);
-	assert(size >0 );
-
-	total =0;
-
-	while
-*/
 int main(int argc, char *argv[])
 {
 
 	pthread_create(&tids[thds], NULL, mydaemon, NULL);
 	thds++;
-	//int nonblflags = fcntl(fileno(stdin), F_GETFL,0);
-	//fcntl(fileno(stdin), F_SETFL, nonblflags | O_NONBLOCK);
 	int fd_sock, cli_sock;
 	int port_num, ret;
 	struct sockaddr_in addr;
@@ -80,9 +66,7 @@ int main(int argc, char *argv[])
 	}
 
 	while (1) {
-		//buffer = NULL;
 		printf("send$ ");
-		//ret = getline(&buffer, &getline_len, stdin);
 		ret = read(fileno(stdin),&buffer,1024);
 		if (ret == -1) { // EOF
 			perror("getline");
@@ -200,8 +184,8 @@ static void * handle(void * arg)
 			len2 += recv(cli_sockfd, recv_buffer+len2, sizeof(recv_buffer), 0);
 		}
 		fsync(cli_sockfd);
-		printf("from client (%d) ----\n", len);
-		if (len == 0) continue;
+		printf("from client (%d)\n", len);
+		if (len == 0) break;
 		printf("%s\n len:%d\n", recv_buffer, len);
 		memset(send_buffer, 0, sizeof(send_buffer));
 		sprintf(send_buffer, "[%s:%s]%s len:%d\n", 
@@ -215,7 +199,6 @@ static void * handle(void * arg)
 		fsync(cli_sockfd);
 
 	}
-	printf("in handle while loop end\n");
 	close(cli_sockfd);
 	ret = 0;
 	pthread_exit(&ret);
