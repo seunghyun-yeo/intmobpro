@@ -21,7 +21,19 @@ void*  mydaemon(void *);
 
 char buffer[1024];
 char r_buffer[1024];
+/*
+int socket_recv(int socket, char* buffer, int size)
+{
+	int total;
+	int received;
 
+	assert(buffer);
+	assert(size >0 );
+
+	total =0;
+
+	while
+*/
 int main(int argc, char *argv[])
 {
 
@@ -82,9 +94,9 @@ int main(int argc, char *argv[])
 			memset(buffer, 0, sizeof(buffer));
 			continue;
 		}
+		send(fd_sock,len,sizeof(len),0);
 		send(fd_sock, buffer, len, 0);
 		memset(buffer, 0, sizeof(buffer));
-
 		memset(r_buffer, 0, sizeof(r_buffer));
 		len = recv(fd_sock, r_buffer, sizeof(r_buffer), 0);
 		if (len < 0) break;
@@ -179,13 +191,17 @@ static void * handle(void * arg)
 
 	while (1) {
 		int len = 0;
-
+		int len2 = 0;
 		memset(recv_buffer, 0, sizeof(recv_buffer));
-		len = recv(cli_sockfd, recv_buffer, sizeof(recv_buffer), 0);
+		recv(cli_sockfd, len, sizeof(len),0);
+		while(len!=len2)
+		{
+			len2 += recv(cli_sockfd, recv_buffer[len2], sizeof(recv_buffer), 0);
+		}
 		fsync(cli_sockfd);
 		printf("from client (%d) ----\n", len);
 		if (len == 0) continue;
-		//printf("%s\n len:%d\n", recv_buffer, len);
+		printf("%s\n len:%d\n", recv_buffer, len);
 		memset(send_buffer, 0, sizeof(send_buffer));
 		sprintf(send_buffer, "[%s:%s]%s len:%d\n", 
 				hbuf, sbuf, recv_buffer, len);
