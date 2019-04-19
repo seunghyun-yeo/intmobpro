@@ -193,7 +193,8 @@ static void * handle(void * arg)
 		int len = 0;
 		int len2 = 0;
 		memset(recv_buffer, 0, sizeof(recv_buffer));
-		recv(cli_sockfd, len, sizeof(len),0);
+		recv(cli_sockfd, &len, sizeof(len),0);
+		printf("%d\n",len);
 		while(len!=len2)
 		{
 			len2 += recv(cli_sockfd, recv_buffer[len2], sizeof(recv_buffer), 0);
