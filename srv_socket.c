@@ -94,7 +94,7 @@ int main(int argc, char *argv[])
 			memset(buffer, 0, sizeof(buffer));
 			continue;
 		}
-		send(fd_sock,len,sizeof(len),0);
+		send(fd_sock,&len,sizeof(len),0);
 		send(fd_sock, buffer, len, 0);
 		memset(buffer, 0, sizeof(buffer));
 		memset(r_buffer, 0, sizeof(r_buffer));
@@ -197,7 +197,7 @@ static void * handle(void * arg)
 		printf("%d\n",len);
 		while(len!=len2)
 		{
-			len2 += recv(cli_sockfd, recv_buffer[len2], sizeof(recv_buffer), 0);
+			len2 += recv(cli_sockfd, recv_buffer+len2, sizeof(recv_buffer), 0);
 		}
 		fsync(cli_sockfd);
 		printf("from client (%d) ----\n", len);
