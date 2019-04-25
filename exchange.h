@@ -1,5 +1,5 @@
 #define port_num 8179
-#define prefix_addr "220.149.244.21"
+#define prefix_addr "220.149.244."
 #define INF 100000000
 
 FILE * input;
@@ -21,9 +21,7 @@ int len;
 size_t getline_len;
 
 char r_buffer[1024];
-typedef struct {
-	char ** info;
-} near_node_recv;
+
 
 
 
@@ -36,3 +34,5 @@ char ** get_nearnode_info(char* destip);
 void init_table();
 void print_d_table();
 void dijkstra();
+int find_min_w(int row);
+void update_d_table(char ** remote_near_node,int i);

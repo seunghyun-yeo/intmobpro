@@ -21,12 +21,64 @@ void main(int argc, char* argv[])
 	dijkstra();
 }
 
+
+void update_d_table(char ** remote_near_node,int i){
+	/*
+	  To do : 
+	  1. 전 행의 최솟 값이었던 애는 INF로 바꾸기
+	  2. 나머지는 전행의 값들 복사해오기
+	  3. 계산을 통해 비교해라 
+	  4. 네모를 구해라(네모는 INF+1 직전의 값)
+	  5. 네모를 구했으면 어제 말한 규칙으로 새로운 전임자 어레이 만들기
+	  	어제 말한 규칙이란 네모와 같은 숫자가 나온 최초의 row 값 
+	 */
+	for(int k=1;k<11;k+=2){
+		d_table[i+1][atoi(&remote_near_node[k][14])]=atoi(remote_near_node[k+1]);
+	}
+}
+
 void dijkstra(){
+	char* local_addr = (char*)malloc(sizeof(char)*15);
+	char ** remote_near_node;
+	int tmp;
+	for(int i=1;i<6;i++){
+		tmp=find_min_w(i);
+		d_table[i+1][0]=tmp;
+		sprintf(local_addr,"%s%d",prefix_addr,find_min_w(i));//make full address
+		remote_near_node=get_nearnode_info(local_addr);
+		update_d_table(remote_near_node);
+		
+	}
+}
+
+int find_min_w(int row){
+	int min= INF;
+	int mark;
+	int tmp,col;
+	
+	for(int i=1;i<7;i++){
+		if(d_table[row][0]==d_table[0][i]){
+			tmp=d_table[row][i];
+			col=i;
+			d_atble[row][i]=INF;
+			break;
+		}
+	}
+
+	for(int i=1;i<7;i++){
+		if(min>d_table[row][i]){
+			min=d_table[row][i];
+			mark=d_table[0][i];
+		}
+	}
+
+	d_table[row][col]=tmp;
+	return mark;
 }
 
 char **  get_nearnode_info(char* destip){
 
-	char ** remote_near_node=(char**)malloc(sizeof(char*)*7);
+	char ** remote_near_node=(char**)malloc(sizeof(char*)*11);
 	int nearnode_index=1;
 	fd_sock = socket(AF_INET, SOCK_STREAM,0);
 	if(fd_sock ==-1){
@@ -48,8 +100,8 @@ char **  get_nearnode_info(char* destip){
 		memset(r_buffer, 0, sizeof(r_buffer));
 		len = recv(fd_sock, r_buffer, sizeof(1024),0);
 		if(strlen(r_buffer)==0) break;
-		remote_near_node[nearnode_index]=(char*)malloc(strlen(r_buffer));
-		strcpy(remote_near_node[nearnode_index],r_buffer);
+		remote_near_node[nearnode_index]=(char*)malloc(strlen(r_buffer));//sender must send line
+		strcpy(remote_near_node[nearnode_index],r_buffer);               //by line
 		fflush(NULL);
 		nearnode_index++;
 	}
@@ -74,6 +126,7 @@ void init_table(){
 }
 
 void init_d_table(char machine){
+	//TODO : add addrss at row 0 and col 0
 	init_table();
 	int machine_index=atoi(&machine);
 	for(int k =1; k< near_node_sz; k+=2){
