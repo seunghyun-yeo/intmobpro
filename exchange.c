@@ -11,70 +11,73 @@
 #include <pthread.h>
 #include <netdb.h>
 
-
 void main(int argc, char* argv[])
 {
-	graph_read();
 	near_node_info(argv[1]);//pass rip[n].txt
 	init_d_table(argv[1][3]);//pass n in rip[n].txt
 	print_d_table();//testing print_d_table();
-	dijkstra();
+	dijkstra((210+atoi(argv[1])));
 }
 
-
-void update_d_table(char ** remote_near_node,int i){
-	/*
-	   To do : 
-	   1. 전 행의 최솟 값이었던 애는 INF로 바꾸기
-	   2. 나머지는 전행의 값들 복사해오기
-	   3. 계산을 통해 비교해라 
-	   4. 네모를 구해라(네모는 INF+1 직전의 값)
-	   5. 네모를 구했으면 어제 말한 규칙으로 새로운 전임자 어레이 만들기
-	   어제 말한 규칙이란 네모와 같은 숫자가 나온 최초의 row 값 
-	 */
-	for(int k=1;k<11;k+=2){
-		d_table[i+1][atoi(&remote_near_node[k][14])]=atoi(remote_near_node[k+1]);
+void dijkstra(int addr){
+	char* local_addr =(char*)malloc(sizeof(char)*15);
+	char** remote_near_node;
+	int tmp=addr;///최신화 필요 숫자형 주소값
+	int rdistance;
+	for(int i=1; i<7; i ++){
+		distance[1][i]=INF;
 	}
-}
 
-void dijkstra(){
-	char* local_addr = (char*)malloc(sizeof(char)*15);
-	char ** remote_near_node;
-	int tmp;
-	for(int i=1;i<6;i++){
-		tmp=find_min_w(i);
-		d_table[i+1][0]=tmp;
-		sprintf(local_addr,"%s%d",prefix_addr,find_min_w(i));//make full address
+	for(int i=1; i<7; i++){
+		pre[1][i]=0;
+	}
+	for(int i=1; i<7; i++){
+	if(distance[0][i]==addr){
+		distance[0][i]=0;
+		break;
+	}
+	}
+	for(int i=1; i<7;i ++){
+		tmp=find_min_w(distance[0][tmp]);
+		rdistance=distance[1][tmp];
+		sprintf(local_addr,"%s%d",prefix_addr,distance[0][tmp]);//make full address
 		remote_near_node=get_nearnode_info(local_addr);
-		update_d_table(remote_near_node, i);
-
+		update_table(remote_near_node,rdistance,distance[0][tmp]);
 	}
 }
 
-int find_min_w(int row){
-	int min= INF;
-	int mark;
-	int tmp,col;
-
+void update_table(char ** remote_near_node, int rdistance,int current){
+	
 	for(int i=1;i<7;i++){
-		if(d_table[row][0]==d_table[0][i]){
-			tmp=d_table[row][i];
-			col=i;
-			d_table[row][i]=INF;
-			break;
+		for(int k=1;k<12;k+=2)
+		{
+			if(atoi(&remote_near_node[k][12])==distance[0][i]){
+				if(distance[1][i]>(rdistance+atoi(remote_near_node[k+1]))){
+					pre[1][i]=current;
+				}
+			}
 		}
 	}
-
-	for(int i=1;i<7;i++){
-		if(min>d_table[row][i]){
-			min=d_table[row][i];
-			mark=d_table[0][i];
-		}
-	}
-
-	d_table[row][col]=tmp;
-	return mark;
 }
+
+int find_min_w(int current){
+	int min=INF;
+	int index;
+	int tmp, col;
+
+	for(int i=1; i< 7;i++){
+		if(min>distance[1][i]){
+			min=distance[1][i];
+			index=i;
+		}
+	}
+	tmpdistance[1][index]=distance[1][index];
+	distance[1][index]=INF;
+//	pre[1][index]=current;
+	return index;
+}
+
+
 void print_d_table(){
 	for(int k=0;k<7;k++){
 		for(int j=0; j<7;j++)
@@ -91,6 +94,16 @@ void init_table(){
 	}
 	for(int k =1; k< 7; k++){
 		d_table[0][k]=210 + k;
+		//newly added
+		distance=(int**)malloc(sizeof(int*)*2);
+		pre=(int**)malloc(sizeof(int*)*2);
+		for(int i=0; i<2; i++){
+			distance[i]=(int*)malloc((sizeof(int)*7));
+			pre[i]=(int*)malloc((sizeof(int)*7));
+		}
+		distance[0][k]=210 + k;
+		pre[0][k]=210 +k;
+		//////////
 	}
 	d_table[0][0] = 0;
 	d_table[0][6] = 144;
@@ -176,7 +189,7 @@ void near_node_info(char* argv){
 	}
 
 }
-
+/*
 void graph_read(){
 	input=fopen("GRAPH.txt","r");
 	if(input == NULL){
@@ -209,4 +222,43 @@ void graph_read(){
 	{
 		printf("%s\n",edges[k]);
 	}
-}
+}*/
+/*
+void dijkstra(){
+	char* local_addr = (char*)malloc(sizeof(char)*15);
+	char ** remote_near_node;
+	int tmp;
+	for(int i=1;i<6;i++){
+		tmp=find_min_w(i);
+		d_table[i+1][0]=tmp;
+		sprintf(local_addr,"%s%d",prefix_addr,find_min_w(i));//make full address
+		remote_near_node=get_nearnode_info(local_addr);
+		update_d_table(remote_near_node, i);
+
+	}
+}*/
+/*
+int find_min_w(int row){
+	int min= INF;
+	int mark;
+	int tmp,col;
+
+	for(int i=1;i<7;i++){
+		if(d_table[row][0]==d_table[0][i]){
+			tmp=d_table[row][i];
+			col=i;
+			d_table[row][i]=INF;
+			break;
+		}
+	}
+
+	for(int i=1;i<7;i++){
+		if(min>d_table[row][i]){
+			min=d_table[row][i];
+			mark=d_table[0][i];
+		}
+	}
+
+	d_table[row][col]=tmp;
+	return mark;
+}*/

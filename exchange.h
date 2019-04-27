@@ -19,8 +19,12 @@ int ret;
 struct sockaddr_in addr;
 int len;
 size_t getline_len;
-
 char r_buffer[1024];
+//int distance[2][7];
+//int pre[2][7];
+int ** distance;
+int ** pre;
+int tmpdistance[2][7];
 
 
 
@@ -33,6 +37,6 @@ void init_d_table(char machine);
 char ** get_nearnode_info(char* destip);
 void init_table();
 void print_d_table();
-void dijkstra();
-int find_min_w(int row);
-void update_d_table(char ** remote_near_node,int i);
+void dijkstra(int addr);
+int find_min_w(int current);
+void update_table(char ** remote_near_node,int distance, int current);
