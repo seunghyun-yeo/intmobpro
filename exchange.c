@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "exchange.h"
 #include <errno.h>
 #include <unistd.h>
 #include <signal.h>
@@ -10,7 +9,8 @@
 #include <arpa/inet.h>
 #include <pthread.h>
 #include <netdb.h>
-
+#include <stdbool.h>
+#include "exchange.h"
 void main(int argc, char* argv[]){
 
 	printf("%d\n",INF);
@@ -66,8 +66,8 @@ void * srv(){
 		}
 		printf("accepted\n");
 		pthread_create(&tids[thds],NULL, handle, &cli_sock);
-		visit++;
-		if(visit==6) break;
+		visited++;
+		if(visited==6) break;
 	}
 	close(srv_sock);
 	ret=0;
@@ -175,17 +175,15 @@ int find_min_w(int current){
 	int tmp, col;
 
 	for(int i=1; i< 7;i++){
-		if(min>distance[1][i]){
+		if(min>distance[1][i]&&visit[i]==false){
 			min=distance[1][i];
 			index=i;
 		}
 	}
 	print_d_table();
-//	printf("%d\n",index);
-//	printf("%d\n",distance[0][index]);
 	tmpdistance[1][index]=distance[1][index];
-	distance[1][index]=INF;
-	//	pre[1][index]=current;
+//	distance[1][index]=INF;
+	visit[index]=true;
 	return index;
 }
 
@@ -229,6 +227,7 @@ void init_table(){
 void init_d_table(char machine){
 
 	init_table();
+	memset(visit,0,sizeof(visit));
 	int machine_index=atoi(&machine);
 	int col_num;
 	for(int k =1; k< near_node_sz; k+=2){

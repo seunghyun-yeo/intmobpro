@@ -21,7 +21,7 @@ int ret;
 struct sockaddr_in addr;
 int len;
 size_t getline_len;
-int visit=0;
+int visited=0;
 //char r_buffer[1024];
 int ** distance;
 int ** pre;
@@ -29,7 +29,7 @@ int tmpdistance[2][7];
 
 pthread_t tids[100];
 int thds=1;
-
+bool visit[7];
 
 
 
