@@ -24,7 +24,7 @@ void main(int argc, char* argv[]){
 void * srv(){
 
 	int srv_sock, cli_sock;
-	int ret;
+	int lret;
 	struct sockaddr_in addr;
 
 	srv_sock= socket(AF_INET, SOCK_STREAM, 0);
@@ -39,9 +39,9 @@ void * srv(){
 	addr.sin_addr.s_addr = htons (INADDR_ANY);
 	addr.sin_port = htons(srv_port_num);
 
-	ret = bind(srv_sock, (struct sockaddr *)&addr,sizeof(addr));
+	lret = bind(srv_sock, (struct sockaddr *)&addr,sizeof(addr));
 
-	if(ret==-1){
+	if(lret==-1){
 		perror("BIND error!!");
 		close(srv_sock);
 		return 0;
@@ -49,9 +49,9 @@ void * srv(){
 
 	for(;;)
 	{
-		ret = listen(srv_sock, 0);
+		lret = listen(srv_sock, 0);
 
-		if(ret ==-1)
+		if(lret ==-1)
 		{
 			perror("LISTEN standby mode fail");
 			close(srv_sock);
@@ -69,7 +69,7 @@ void * srv(){
 		thds++;
 		pthread_create(&tids[thds],NULL, handle, &cli_sock);
 		visited++;
-		if(visited==7) break;
+		if(visited==6) break;
 	}
 	close(srv_sock);
 	ret=0;
