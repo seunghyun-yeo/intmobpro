@@ -2,7 +2,7 @@
 #define srv_port_num 8180
 #define prefix_addr "220.149.244."
 #define INF 100000000
-#define timebuffer 0xffffff
+#define timebuffer 0xfffffff
 FILE * input;
 char ** near_node;
 char * line = NULL;
