@@ -18,7 +18,7 @@ void main(int argc, char* argv[]){
 	pthread_create(&tids[thds],NULL,srv, NULL);//trigger srv daemon
 	init_d_table(argv[1][3]);//pass n in rip[n].txt
 	dijkstra(210+(atoi(&argv[1][3])));
-	pthread_join(tids[0],(void **)&ret);
+	pthread_join(tids[1],(void **)&ret);
 }
 
 void * srv(){
