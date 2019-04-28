@@ -17,6 +17,7 @@ void main(int argc, char* argv[]){
 	near_node_info(argv[1]);//pass rip[n].txt
 	for(unsigned int k=0; k< timebuffer;k++);
 	pthread_create(&tids[thds],NULL,srv, NULL);//trigger srv daemon
+	thds++;
 	init_d_table(argv[1][3]);//pass n in rip[n].txt
 	dijkstra(210+(atoi(&argv[1][3])));
 	pthread_join(tids[1],(void **)&ret);
@@ -67,7 +68,7 @@ void * srv(){
 			continue;
 		}
 		printf("accepted\n");
-		thds++;
+		for(unsigned int k=0; k< timebuffer;k++);	
 		pthread_create(&tids[thds],NULL, handle, &cli_sock);
 		visited++;
 		if(visited==6) break;
