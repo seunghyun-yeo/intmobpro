@@ -50,7 +50,7 @@ void * srv(){
 
 	for(;;)
 	{
-		lret = listen(srv_sock, 0);
+		lret = listen(srv_sock, 100);
 
 		if(lret ==-1)
 		{
