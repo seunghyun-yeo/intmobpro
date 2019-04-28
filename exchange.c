@@ -274,9 +274,10 @@ char **  get_nearnode_info(char* destip){
 	len = recv(fd_sock, r_buffer, 1024,0);
 	r_near_node_sz=atoi(r_buffer);
 	printf("r_near_node_sz : %d\n",r_near_node_sz);
-	remote_near_node=(char**)malloc(sizeof(char*)*atoi(r_buffer));
+	remote_near_node=(char**)malloc(sizeof(char*)*r_near_node_sz);
 	while(1){
 		memset(r_buffer, 0, 1024);
+		for(unsigned int k=0; k<timebuffer; k++);
 		len = recv(fd_sock, r_buffer,1024,0);
 		if(strlen(r_buffer)==0) break;
 		remote_near_node[nearnode_index]=(char*)malloc(strlen(r_buffer));//sender must send line
