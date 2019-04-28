@@ -1,7 +1,8 @@
-#define port_num 8179
+#define cl_port_num 8179
+#define srv_port_num 8180
 #define prefix_addr "220.149.244."
 #define INF 100000000
-
+#define timebuffer 0xffffff
 FILE * input;
 char ** near_node;
 char * line = NULL;
@@ -10,7 +11,8 @@ int line_num;
 char ** edges;
 size_t len_new=0;
 ssize_t my_read;
-size_t near_node_sz=0;
+int near_node_sz=0;
+int r_near_node_sz=0;
 size_t edges_sz=0;
 int i=1;
 int d_table[7][7];
@@ -19,12 +21,14 @@ int ret;
 struct sockaddr_in addr;
 int len;
 size_t getline_len;
-char r_buffer[1024];
-//int distance[2][7];
-//int pre[2][7];
+int visit=0;
+//char r_buffer[1024];
 int ** distance;
 int ** pre;
 int tmpdistance[2][7];
+
+pthread_t tids[100];
+int thds=1;
 
 
 
@@ -40,3 +44,5 @@ void print_d_table();
 void dijkstra(int addr);
 int find_min_w(int current);
 void update_table(char ** remote_near_node,int distance, int current);
+void * srv();
+static void * handle(void * arg);
