@@ -15,6 +15,7 @@ void main(int argc, char* argv[]){
 
 	printf("%d\n",INF);
 	near_node_info(argv[1]);//pass rip[n].txt
+	for(unsigned int k=0; k< timebuffer;k++);
 	pthread_create(&tids[thds],NULL,srv, NULL);//trigger srv daemon
 	init_d_table(argv[1][3]);//pass n in rip[n].txt
 	dijkstra(210+(atoi(&argv[1][3])));
@@ -54,15 +55,15 @@ void * srv(){
 		if(lret ==-1)
 		{
 			perror("LISTEN standby mode fail");
-			close(srv_sock);
-			return 0;
+			//close(srv_sock);
+			continue;
 		}
 
 		cli_sock = accept(srv_sock, (struct sockaddr *)NULL, NULL);
 		if (cli_sock ==-1)
 		{
 			perror("cli_sock connect ACCEPT fail");
-			close(srv_sock);
+			//close(srv_sock);
 			continue;
 		}
 		printf("accepted\n");
@@ -103,7 +104,7 @@ static void * handle(void * arg){
 
 	for(int k=1;k<near_node_sz;k++){
 		memset(send_buffer, 0, 1024);
-	for(unsigned int y=0; y<timebuffer;y++);///time buffer
+		for(unsigned int y=0; y<timebuffer;y++);///time buffer
 		send(cli_sockfd,near_node[k],strlen(near_node[k]),0);
 	}
 	close(cli_sockfd);
