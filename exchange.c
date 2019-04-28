@@ -250,7 +250,7 @@ void init_d_table(char machine){
 char **  get_nearnode_info(char* destip){
 	char ** remote_near_node;//=(char**)malloc(sizeof(char*)*11);
 	int nearnode_index=1;
-	char r_buffer[1024];
+	char* r_buffer = (char*)malloc(1024);
 	struct sockaddr_in addr;
 
 	fd_sock = socket(AF_INET, SOCK_STREAM,0);
@@ -270,7 +270,7 @@ char **  get_nearnode_info(char* destip){
 	}
 	printf("connection established\n");
 	//send(fd_sock,"request near_node",sizeof("request near_node"),0);
-	memset(r_buffer,0,sizeof(r_buffer));
+	memset(r_buffer,0,1024);
 	len = recv(fd_sock, r_buffer, 1024,0);
 	r_near_node_sz=atoi(r_buffer);
 	printf("r_near_node_sz : %d\n",r_near_node_sz);
