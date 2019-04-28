@@ -17,7 +17,7 @@ void main(int argc, char* argv[]){
 	near_node_info(argv[1]);//pass rip[n].txt
 	pthread_create(&tids[thds],NULL,srv, NULL);//trigger srv daemon
 	init_d_table(argv[1][3]);//pass n in rip[n].txt
-	dijkstra(211);
+	dijkstra(210+(atoi(&argv[1][3])));
 }
 
 void * srv(){
