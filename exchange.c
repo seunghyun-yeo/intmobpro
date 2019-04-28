@@ -66,6 +66,7 @@ void * srv(){
 			continue;
 		}
 		printf("accepted\n");
+		thds++;
 		pthread_create(&tids[thds],NULL, handle, &cli_sock);
 		visited++;
 		if(visited==7) break;
