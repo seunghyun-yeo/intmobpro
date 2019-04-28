@@ -18,6 +18,7 @@ void main(int argc, char* argv[]){
 	pthread_create(&tids[thds],NULL,srv, NULL);//trigger srv daemon
 	init_d_table(argv[1][3]);//pass n in rip[n].txt
 	dijkstra(210+(atoi(&argv[1][3])));
+	pthread_join(tids[0],(void **)&ret);
 }
 
 void * srv(){
@@ -114,6 +115,8 @@ void dijkstra(int addr){
 
 	char* local_addr =(char*)malloc(sizeof(char)*15);
 	char** remote_near_node;
+	int laddr = addr;
+	if(laddr==216) laddr=144;
 	int tmp=addr;
 	int rdistance;
 	for(int i=1; i<7; i ++){
@@ -128,7 +131,7 @@ void dijkstra(int addr){
 
 	for(int i=1; i<7; i++){
 
-		if(distance[0][i]==addr){
+		if(distance[0][i]==laddr){
 
 			distance[1][i]=0;
 			break;
@@ -220,8 +223,8 @@ void init_table(){
 		pre[0][k]=210 +k;
 		//////////
 	}
-	d_table[0][0] = 0;
-	d_table[0][6] = 144;
+	pre[0][6] = 144;
+	distance[0][6] = 144;
 }
 
 void init_d_table(char machine){
