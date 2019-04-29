@@ -84,6 +84,7 @@ static void * handle(void * arg){
 	int cli_sockfd=*(int*)arg;
 	int lret=-1;
 	char send_buffer[1024];
+	char recv_buffer[2];
 	char hbuf[NI_MAXHOST], sbuf[NI_MAXSERV];
 
 	struct sockaddr peer_addr;
@@ -102,11 +103,13 @@ static void * handle(void * arg){
 	sprintf(send_buffer,"%d",near_node_sz);
 	printf("%s\n",send_buffer);
 	send(cli_sockfd,send_buffer,strlen(send_buffer),0);
-
+	recv(cli_sockfd,recv_buffer,sizeof(recv_buffer),0);
 	for(int k=1;k<near_node_sz;k++){
 		memset(send_buffer, 0, 1024);
 		for(unsigned int y=0; y<timebuffer;y++);///time buffer
 		send(cli_sockfd,near_node[k],strlen(near_node[k]),0);
+
+		recv(cli_sockfd,recv_buffer,sizeof(recv_buffer),0);
 	}
 	close(cli_sockfd);
 	lret =0;
@@ -152,9 +155,12 @@ void dijkstra(int addr){
 		printf("after get_nearnode_info\n");
 		update_table(remote_near_node,rdistance,distance[0][tmp]);
 	}
+	printf("============final table================\n");
+	print_d_table();
 }
 
 void update_table(char ** remote_near_node, int rdistance,int current){
+	printf("update_table function\n");
 	char* saddr = (char*)malloc(sizeof(char)*4);
 	//printf("%s",remote_near_node[1]);
 	for(int i=1;i<7;i++){
@@ -162,7 +168,7 @@ void update_table(char ** remote_near_node, int rdistance,int current){
 		{
 			strncpy(saddr,&(remote_near_node[k][12]),4);
 			saddr[3]='\0';
-		//	printf("%s\n",saddr);
+			//	printf("%s\n",saddr);
 			if(atoi(saddr)==distance[0][i]){
 				if(distance[1][i]>(rdistance+atoi(remote_near_node[k+1]))){
 					//printf("updated\n");
@@ -176,7 +182,7 @@ void update_table(char ** remote_near_node, int rdistance,int current){
 }
 
 int find_min_w(int current){
-	int min=INF;
+	int min=INF; // When the last value is INF, then we have to choose INF node
 	int index=1;
 	int tmp, col;
 
@@ -188,7 +194,7 @@ int find_min_w(int current){
 	}
 	print_d_table();
 	tmpdistance[1][index]=distance[1][index];
-//	distance[1][index]=INF;
+	//	distance[1][index]=INF;
 	visit[index]=true;
 	return index;
 }
@@ -221,8 +227,8 @@ void init_table(){
 		d_table[0][k]=210 + k;
 		//newly added
 		distance[0][k]=210 + k;
-//		printf("%09d\t",distance[0][k]);
-//		printf("\n");
+		//		printf("%09d\t",distance[0][k]);
+		//		printf("\n");
 		pre[0][k]=210 +k;
 		//////////
 	}
@@ -250,11 +256,14 @@ void init_d_table(char machine){
 char **  get_nearnode_info(char* destip){
 	char ** remote_near_node;//=(char**)malloc(sizeof(char*)*11);
 	int nearnode_index=1;
-	char* r_buffer = (char*)malloc(1024);
+	char r_buffer[1024];
+	char s_buffer[2];
 	struct sockaddr_in addr;
 
+	sprintf(s_buffer,"1");
+
 	fd_sock = socket(AF_INET, SOCK_STREAM,0);
-	if(fd_sock ==-1){
+	if(fd_sock ==-1){ 
 		perror("socket");
 		return NULL;
 	}
@@ -274,11 +283,13 @@ char **  get_nearnode_info(char* destip){
 	len = recv(fd_sock, r_buffer, 1024,0);
 	r_near_node_sz=atoi(r_buffer);
 	printf("r_near_node_sz : %d\n",r_near_node_sz);
+	send(fd_sock, s_buffer, sizeof(s_buffer),0);
 	remote_near_node=(char**)malloc(sizeof(char*)*r_near_node_sz);
 	while(1){
 		memset(r_buffer, 0, 1024);
 		for(unsigned int k=0; k<timebuffer; k++);
 		len = recv(fd_sock, r_buffer,1024,0);
+		send(fd_sock, s_buffer, sizeof(s_buffer),0);
 		if(strlen(r_buffer)==0) break;
 		remote_near_node[nearnode_index]=(char*)malloc(strlen(r_buffer));//sender must send line
 		strcpy(remote_near_node[nearnode_index],r_buffer);		//by line
