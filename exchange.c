@@ -162,8 +162,13 @@ void dijkstra(int addr){
 	for(int i=1; i<7; i ++){
 
 		distance[1][i]=INF;
+		pre[1][i]=0;
+		if(distance[0][i]==laddr){
+			distance[1][i]=0;
+			pre[1][i]=laddr;
+		}
 	}
-
+/*
 	for(int i=1; i<7; i++){
 
 		pre[1][i]=0;
@@ -177,7 +182,7 @@ void dijkstra(int addr){
 			break;
 		}
 	}
-
+*/
 	for(int i=1; i<7;i ++){
 
 		tmp=find_min_w(distance[0][tmp]);
