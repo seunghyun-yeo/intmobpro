@@ -34,12 +34,14 @@ void print_r_table(){
 }
 
 void make_r_table(int s){
+	int laddr = s;
+	if(laddr==216)laddr=144;
 	for(int i=1; i<7;i++){
 		int k=i;
 		int j;
 		dest[i]=pre[0][i];
 
-		while(pre[1][k]!=s){
+		while(pre[1][k]!=laddr){
 			for(j=1;pre[0][j]!=pre[1][k];j++);
 			k=j;
 		}
