@@ -15,7 +15,6 @@ void main(int argc, char* argv[]){
 
 	printf("%d\n",INF);
 	near_node_info(argv[1]);//pass rip[n].txt
-	for(unsigned int k=0; k< timebuffer;k++);
 	pthread_create(&tids[thds],NULL,srv, NULL);//trigger srv daemon
 	thds++;
 	init_d_table(argv[1][3]);//pass n in rip[n].txt
@@ -103,11 +102,16 @@ static void * handle(void * arg){
 	printf("%s\n",send_buffer);
 	send(cli_sockfd,&near_node_sz,sizeof(int),0);
 	recv(cli_sockfd,recv_buffer,sizeof(recv_buffer),0);
+
 	for(int k=1;k<near_node_sz;k++){
 		memset(send_buffer, 0, 1024);
 		sprintf(send_buffer,"%s",near_node[k]);
 		send(cli_sockfd,send_buffer,strlen(send_buffer),0);
+		recv(cli_sockfd,recv_buffer,sizeof(recv_buffer),0);
 	}
+
+
+
 	close(cli_sockfd);
 	lret =0;
 	pthread_exit(&lret);
@@ -261,6 +265,9 @@ char **  get_nearnode_info(char* destip){
 	addr.sin_family = AF_INET;
 	addr.sin_port = htons(srv_port_num);
 	inet_pton(AF_INET,destip,&addr.sin_addr);
+	
+	
+	
 	ret=-1;
 	printf("before connect : %s:%d\n",destip,srv_port_num);
 	while(ret==-1)
@@ -268,16 +275,25 @@ char **  get_nearnode_info(char* destip){
 		ret=connect(fd_sock, (struct sockaddr*)&addr, sizeof(addr));
 	}
 	printf("connection established\n");
+	
+	
+	
+	
 	memset(r_buffer,0,1024);
 	len = recv(fd_sock, &lnearnodesz, sizeof(int),0);
 	r_near_node_sz=lnearnodesz;
+	send(fd_sock,&s_buffer,sizeof(s_buffer),0);
+
 	printf("r_near_node_sz : %d\n",r_near_node_sz);
 	remote_near_node=(char**)malloc(sizeof(char*)*r_near_node_sz);
+	
+	
 	for(nearnode_index=1;nearnode_index<r_near_node_sz;nearnode_index++){
 		memset(r_buffer, 0, 1024);
 		len = recv(fd_sock, r_buffer,1024,0);
 		remote_near_node[nearnode_index]=(char*)malloc(strlen(r_buffer));//sender must send line
-		strcpy(remote_near_node[nearnode_index],r_buffer);		//by line
+		strcpy(remote_near_node[nearnode_index],r_buffer);
+		send(fd_sock,&s_buffer,sizeof(s_buffer),0);
 		printf("remote_near_node[%d] : %s\n",nearnode_index,remote_near_node[nearnode_index]);
 		fflush(NULL);
 	}
