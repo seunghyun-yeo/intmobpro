@@ -102,7 +102,7 @@ static void * handle(void * arg){
 	memset(send_buffer,0,1024);
 	sprintf(send_buffer,"%d",near_node_sz);
 	printf("%s\n",send_buffer);
-	send(cli_sockfd,send_buffer,strlen(send_buffer),0);
+	send(cli_sockfd,&near_node_sz,sizeof(int),0);
 	fsync(cli_sockfd);
 	fflush(NULL);
 	recv(cli_sockfd,recv_buffer,sizeof(recv_buffer),0);
@@ -265,6 +265,7 @@ char **  get_nearnode_info(char* destip){
 	int nearnode_index=1;
 	char r_buffer[1024];
 	char s_buffer[2];
+	int lnearnodesz=0;
 	struct sockaddr_in addr;
 
 	sprintf(s_buffer,"1");
@@ -287,11 +288,11 @@ char **  get_nearnode_info(char* destip){
 	printf("connection established\n");
 	//send(fd_sock,"request near_node",sizeof("request near_node"),0);
 	memset(r_buffer,0,1024);
-	len = recv(fd_sock, r_buffer, 1024,0);
+	len = recv(fd_sock, &lnearnodesz, sizeof(int),0);
 
 		fsync(fd_sock);
 		fflush(NULL);
-	r_near_node_sz=atoi(r_buffer);
+	r_near_node_sz=lnearnodesz;
 	printf("r_near_node_sz : %d\n",r_near_node_sz);
 	send(fd_sock, s_buffer, sizeof(s_buffer),0);
 	
