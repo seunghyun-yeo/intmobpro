@@ -104,15 +104,19 @@ static void * handle(void * arg){
 	printf("%s\n",send_buffer);
 	send(cli_sockfd,send_buffer,strlen(send_buffer),0);
 	fsync(cli_sockfd);
+	fflush(NULL);
 	recv(cli_sockfd,recv_buffer,sizeof(recv_buffer),0);
 	fsync(cli_sockfd);
+	fflush(NULL);
 	for(int k=1;k<near_node_sz;k++){
 		memset(send_buffer, 0, 1024);
 		for(unsigned int y=0; y<timebuffer;y++);///time buffer
 		send(cli_sockfd,near_node[k],strlen(near_node[k]),0);
 		fsync(cli_sockfd);
+	fflush(NULL);
 		recv(cli_sockfd,recv_buffer,sizeof(recv_buffer),0);
 		fsync(cli_sockfd);
+	fflush(NULL);
 	}
 	close(cli_sockfd);
 	lret =0;
@@ -291,6 +295,7 @@ char **  get_nearnode_info(char* destip){
 	send(fd_sock, s_buffer, sizeof(s_buffer),0);
 	
 		fsync(fd_sock);
+	fflush(NULL);
 	remote_near_node=(char**)malloc(sizeof(char*)*r_near_node_sz);
 	while(1){
 		memset(r_buffer, 0, 1024);
@@ -298,9 +303,11 @@ char **  get_nearnode_info(char* destip){
 		len = recv(fd_sock, r_buffer,1024,0);
 
 		fsync(fd_sock);
+	fflush(NULL);
 		send(fd_sock, s_buffer, sizeof(s_buffer),0);
 		
 		fsync(fd_sock);
+	fflush(NULL);
 		if(strlen(r_buffer)==0) break;
 		remote_near_node[nearnode_index]=(char*)malloc(strlen(r_buffer));//sender must send line
 		strcpy(remote_near_node[nearnode_index],r_buffer);		//by line
