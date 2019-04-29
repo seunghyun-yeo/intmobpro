@@ -19,6 +19,19 @@ void main(int argc, char* argv[]){
 	thds++;
 	dijkstra(210+(atoi(&argv[1][3])));
 	pthread_join(tids[1],(void **)&ret);
+	printf("==========================final_d_table============================");
+	print_d_table();
+	printf("==========================final_p_table============================");
+	print_p_table();
+}
+void print_p_table(){
+
+	for(int k=0;k<2;k++){
+		for(int i=1;i<7;i++){
+			printf("%9d\t",pre[k][i]);
+		}
+		printf("\n");
+	}
 }
 
 void * srv(){
@@ -99,7 +112,7 @@ static void * handle(void * arg){
 
 	memset(send_buffer,0,1024);
 	sprintf(send_buffer,"%d",near_node_sz);
-	printf("%s\n",send_buffer);
+	//printf("%s\n",send_buffer);
 	send(cli_sockfd,&near_node_sz,sizeof(int),0);
 	recv(cli_sockfd,recv_buffer,sizeof(recv_buffer),0);
 
@@ -111,6 +124,7 @@ static void * handle(void * arg){
 	}
 	close(cli_sockfd);
 	lret =0;
+	printf("handle closed\n");
 	pthread_exit(&lret);
 }
 
