@@ -31,17 +31,17 @@ void main(int argc, char* argv[]){
 void make_legacy(){
 	FILE * output;
 	output=fopen("table.txt","w");
-	char * line=(char*)malloc(sizeof(char)*8);
+	char * line=(char*)malloc(sizeof(char)*32);
 	for(int i=1;i<7;i++)
 	{
-		sprintf(line,"%d:%d\n",dest[i],next[i]);
+		sprintf(line,"%s%d:%s%d\n",prefix_addr,dest[i],prefix_addr,next[i]);
 		fputs(line,output);
 	}
 	fclose(output);
 }
 void print_r_table(){
 	for(int i=1; i<7;i++){
-		printf("%9d:%d\n",dest[i],next[i]);
+		printf("%d:%d\n",dest[i],next[i]);
 	}
 }
 
