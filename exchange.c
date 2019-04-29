@@ -269,7 +269,7 @@ char **  get_nearnode_info(char* destip){
 	char s_buffer='1';
 	int lnearnodesz=0;
 	struct sockaddr_in addr;
-
+	int llen=0;
 
 	fd_sock = socket(AF_INET, SOCK_STREAM,0);
 	if(fd_sock ==-1){ 
@@ -290,7 +290,7 @@ char **  get_nearnode_info(char* destip){
 	printf("connection established\n");
 	//send(fd_sock,"request near_node",sizeof("request near_node"),0);
 	memset(r_buffer,0,1024);
-	len = recv(fd_sock, &lnearnodesz, sizeof(int),0);
+	while(len!=0)len = recv(fd_sock, &lnearnodesz, sizeof(int),0);
 	fsync(fd_sock);
 	fflush(NULL);
 	r_near_node_sz=lnearnodesz;
