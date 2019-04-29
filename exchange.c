@@ -31,10 +31,10 @@ void main(int argc, char* argv[]){
 void make_legacy(){
 	FILE * output;
 	output=fopen("route.txt","w");
-	char * line=(char*)malloc(sizeof(char)*7);
+	char * line=(char*)malloc(sizeof(char)*8);
 	for(int i=1;i<7;i++)
 	{
-		sprintf(line,"%d:%d",dest[i],next[i]);
+		sprintf(line,"%d:%d\n",dest[i],next[i]);
 		fputs(line,output);
 	}
 	fclose(output);
