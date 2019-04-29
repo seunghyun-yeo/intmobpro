@@ -19,9 +19,9 @@ void main(int argc, char* argv[]){
 	thds++;
 	dijkstra(210+(atoi(&argv[1][3])));
 	pthread_join(tids[1],(void **)&ret);
-	printf("==========================final_d_table============================");
+	printf("==========================final_d_table============================\n");
 	print_d_table();
-	printf("==========================final_p_table============================");
+	printf("==========================final_p_table============================\n");
 	print_p_table();
 }
 void print_p_table(){
