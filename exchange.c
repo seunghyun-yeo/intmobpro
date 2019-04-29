@@ -15,7 +15,6 @@ void main(int argc, char* argv[]){
 
 	printf("%d\n",INF);
 	near_node_info(argv[1]);//pass rip[n].txt
-	for(unsigned int k=0; k< timebuffer;k++);
 	pthread_create(&tids[thds],NULL,srv, NULL);//trigger srv daemon
 	thds++;
 	init_d_table(argv[1][3]);//pass n in rip[n].txt
@@ -56,15 +55,14 @@ void * srv(){
 		if(lret ==-1)
 		{
 			perror("LISTEN standby mode fail");
-			//close(srv_sock);
-			continue;
+			close(srv_sock);
+			pthread_exit(&lret);
 		}
 
 		cli_sock = accept(srv_sock, (struct sockaddr *)NULL, NULL);
 		if (cli_sock ==-1)
 		{
 			perror("cli_sock connect ACCEPT fail");
-			//close(srv_sock);
 			continue;
 		}
 		printf("accepted\n");
@@ -103,22 +101,17 @@ static void * handle(void * arg){
 	sprintf(send_buffer,"%d",near_node_sz);
 	printf("%s\n",send_buffer);
 	send(cli_sockfd,&near_node_sz,sizeof(int),0);
-	fsync(cli_sockfd);
-	fflush(NULL);
 	recv(cli_sockfd,recv_buffer,sizeof(recv_buffer),0);
-	fsync(cli_sockfd);
-	fflush(NULL);
+
 	for(int k=1;k<near_node_sz;k++){
 		memset(send_buffer, 0, 1024);
-		//for(unsigned int y=0; y<timebuffer;y++);///time buffer
 		sprintf(send_buffer,"%s",near_node[k]);
-		send(cli_sockfd,send_buffer,1024,0);
-		fsync(cli_sockfd);
-	fflush(NULL);
+		send(cli_sockfd,send_buffer,strlen(send_buffer),0);
 		recv(cli_sockfd,recv_buffer,sizeof(recv_buffer),0);
-		fsync(cli_sockfd);
-	fflush(NULL);
 	}
+
+
+
 	close(cli_sockfd);
 	lret =0;
 	pthread_exit(&lret);
@@ -170,16 +163,13 @@ void dijkstra(int addr){
 void update_table(char ** remote_near_node, int rdistance,int current){
 	printf("update_table function\n");
 	char* saddr = (char*)malloc(sizeof(char)*4);
-	//printf("%s",remote_near_node[1]);
 	for(int i=1;i<7;i++){
 		for(int k=1;k<r_near_node_sz;k+=2)
 		{
 			strncpy(saddr,&(remote_near_node[k][12]),4);
 			saddr[3]='\0';
-			//	printf("%s\n",saddr);
 			if(atoi(saddr)==distance[0][i]){
 				if(distance[1][i]>(rdistance+atoi(remote_near_node[k+1]))){
-					//printf("updated\n");
 					distance[1][i]=(rdistance+atoi(remote_near_node[k+1]));
 					pre[1][i]=current;
 				}
@@ -202,7 +192,6 @@ int find_min_w(int current){
 	}
 	print_d_table();
 	tmpdistance[1][index]=distance[1][index];
-	//	distance[1][index]=INF;
 	visit[index]=true;
 	return index;
 }
@@ -233,12 +222,8 @@ void init_table(){
 
 	for(int k =1; k< 7; k++){
 		d_table[0][k]=210 + k;
-		//newly added
 		distance[0][k]=210 + k;
-		//		printf("%09d\t",distance[0][k]);
-		//		printf("\n");
 		pre[0][k]=210 +k;
-		//////////
 	}
 	pre[0][6] = 144;
 	distance[0][6] = 144;
@@ -280,6 +265,9 @@ char **  get_nearnode_info(char* destip){
 	addr.sin_family = AF_INET;
 	addr.sin_port = htons(srv_port_num);
 	inet_pton(AF_INET,destip,&addr.sin_addr);
+	
+	
+	
 	ret=-1;
 	printf("before connect : %s:%d\n",destip,srv_port_num);
 	while(ret==-1)
@@ -287,36 +275,27 @@ char **  get_nearnode_info(char* destip){
 		ret=connect(fd_sock, (struct sockaddr*)&addr, sizeof(addr));
 	}
 	printf("connection established\n");
-	//send(fd_sock,"request near_node",sizeof("request near_node"),0);
+	
+	
+	
+	
 	memset(r_buffer,0,1024);
 	len = recv(fd_sock, &lnearnodesz, sizeof(int),0);
-
-		fsync(fd_sock);
-		fflush(NULL);
 	r_near_node_sz=lnearnodesz;
-	printf("r_near_node_sz : %d\n",r_near_node_sz);
-	send(fd_sock, s_buffer, sizeof(s_buffer),0);
-	
-		fsync(fd_sock);
-	fflush(NULL);
-	remote_near_node=(char**)malloc(sizeof(char*)*r_near_node_sz);
-	while(1){
-		memset(r_buffer, 0, 1024);
-		for(unsigned int k=0; k<timebuffer; k++);
-		len = recv(fd_sock, r_buffer,1024,0);
+	send(fd_sock,&s_buffer,sizeof(s_buffer),0);
 
-		fsync(fd_sock);
-	fflush(NULL);
-		send(fd_sock, s_buffer, sizeof(s_buffer),0);
-		
-		fsync(fd_sock);
-	fflush(NULL);
-		if(strlen(r_buffer)==0) break;
+	printf("r_near_node_sz : %d\n",r_near_node_sz);
+	remote_near_node=(char**)malloc(sizeof(char*)*r_near_node_sz);
+	
+	
+	for(nearnode_index=1;nearnode_index<r_near_node_sz;nearnode_index++){
+		memset(r_buffer, 0, 1024);
+		len = recv(fd_sock, r_buffer,1024,0);
 		remote_near_node[nearnode_index]=(char*)malloc(strlen(r_buffer));//sender must send line
-		strcpy(remote_near_node[nearnode_index],r_buffer);		//by line
+		strcpy(remote_near_node[nearnode_index],r_buffer);
+		send(fd_sock,&s_buffer,sizeof(s_buffer),0);
 		printf("remote_near_node[%d] : %s\n",nearnode_index,remote_near_node[nearnode_index]);
 		fflush(NULL);
-		nearnode_index++;
 	}
 	close(fd_sock);
 	return remote_near_node;
