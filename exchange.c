@@ -290,6 +290,7 @@ char **  get_nearnode_info(char* destip){
 	len = recv(fd_sock, r_buffer, 1024,0);
 
 		fsync(fd_sock);
+		fflush(NULL);
 	r_near_node_sz=atoi(r_buffer);
 	printf("r_near_node_sz : %d\n",r_near_node_sz);
 	send(fd_sock, s_buffer, sizeof(s_buffer),0);
