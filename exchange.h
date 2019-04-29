@@ -46,3 +46,4 @@ int find_min_w(int current);
 void update_table(char ** remote_near_node,int distance, int current);
 void * srv();
 static void * handle(void * arg);
+void print_p_table();
