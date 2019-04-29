@@ -67,6 +67,7 @@ void * srv(){
 		printf("accepted\n");
 		for(unsigned int k=0; k< timebuffer;k++);	
 		pthread_create(&tids[thds],NULL, handle, &cli_sock);
+		pthread_join(tids[thds],(void**)&ret);
 		visited++;
 		if(visited==6) break;
 	}
@@ -92,7 +93,7 @@ static void * handle(void * arg){
 	lret = getnameinfo(&peer_addr, peer_addr_len,
 			hbuf,sizeof(hbuf),sbuf,sizeof(sbuf),NI_NUMERICHOST | NI_NUMERICSERV);
 	if (lret !=0){
-		lret =-1;
+		lret =0;
 		pthread_exit(&lret);
 	}
 
@@ -108,9 +109,6 @@ static void * handle(void * arg){
 		send(cli_sockfd,send_buffer,strlen(send_buffer),0);
 		recv(cli_sockfd,recv_buffer,sizeof(recv_buffer),0);
 	}
-
-
-
 	close(cli_sockfd);
 	lret =0;
 	pthread_exit(&lret);
