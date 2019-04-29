@@ -13,11 +13,10 @@
 #include "exchange.h"
 void main(int argc, char* argv[]){
 
-	printf("%d\n",INF);
 	near_node_info(argv[1]);//pass rip[n].txt
+	init_d_table(argv[1][3]);//pass n in rip[n].txt
 	pthread_create(&tids[thds],NULL,srv, NULL);//trigger srv daemon
 	thds++;
-	init_d_table(argv[1][3]);//pass n in rip[n].txt
 	dijkstra(210+(atoi(&argv[1][3])));
 	pthread_join(tids[1],(void **)&ret);
 }
