@@ -10,10 +10,14 @@
 #include <pthread.h>
 #include <netdb.h>
 #include <fcntl.h>
+#define myself "220.149.244.212"
 
 char inputbuffer[1024];
 pthread_t tids[100];
 int thds, h_thds;
+char* dst_ip = NULL;
+char* src_ip = NULL;
+char* data = NULL;
 
 int pid;
 static void * handle(void *);
@@ -24,7 +28,6 @@ char r_buffer[1024];
 
 int main(int argc, char *argv[])
 {
-
 	pthread_create(&tids[thds], NULL, mydaemon, NULL);
 	thds++;
 	int fd_sock, cli_sock;
@@ -32,13 +35,16 @@ int main(int argc, char *argv[])
 	struct sockaddr_in addr;
 	int len;
 	size_t getline_len;
+	dst_ip = (char*)malloc(15);
+	src_ip = (char*)malloc(15);
+	data = (char*)malloc(1024);
 
 	// arg parsing
 	if (argc != 3) {
 		printf("usage: cli srv_ip_addr port\n");
 		return 0;
 	}
-	port_num = atoi(argv[2]);
+	port_num = 6628;
 
 	// socket creation
 	fd_sock = socket(AF_INET, SOCK_STREAM, 0);
@@ -51,12 +57,12 @@ int main(int argc, char *argv[])
 	memset(&addr, 0, sizeof(addr));
 	addr.sin_family = AF_INET;
 	addr.sin_port = htons (port_num);
-	inet_pton(AF_INET, argv[1], &addr.sin_addr);
+	inet_pton(AF_INET, myself, &addr.sin_addr);
 	ret=-1;
-	printf("try connect to %s:%s\n",argv[1],argv[2]);
+	printf("try connect to %s:%s\n",argv[1],port_num);
 	while(ret==-1)
 	{
-	ret = connect(fd_sock, (struct sockaddr *)&addr, sizeof(addr));
+		ret = connect(fd_sock, (struct sockaddr *)&addr, sizeof(addr));
 	}
 	printf("connection established\n");
 	if (ret == -1) {
@@ -80,6 +86,7 @@ int main(int argc, char *argv[])
 		}
 		send(fd_sock,&len,sizeof(len),0);
 		send(fd_sock, buffer, len, 0);
+		strncpy(dst_ip, buffer, 15);
 		memset(buffer, 0, sizeof(buffer));
 		memset(r_buffer, 0, sizeof(r_buffer));
 		len = recv(fd_sock, r_buffer, sizeof(r_buffer), 0);
@@ -100,7 +107,7 @@ void * mydaemon(void * args)
 	int len;
 
 	// socket creation
-	port_num = 8179;
+	port_num = 6628;
 
 	srv_sock = socket(AF_INET, SOCK_STREAM, 0);
 	if (srv_sock == -1) {
@@ -122,12 +129,12 @@ void * mydaemon(void * args)
 		return 0;
 	}
 
-	for (;;) 
+	for (;;)
 	{
 		// Listen part
 		ret = listen(srv_sock, 0);
 
-		if (ret == -1) 
+		if (ret == -1)
 		{
 			perror("LISTEN stanby mode fail");
 			close(srv_sock);
@@ -136,7 +143,7 @@ void * mydaemon(void * args)
 
 		// Accept part ( create new client socket for communicate to client ! )
 		cli_sock = accept(srv_sock, (struct sockaddr *)NULL, NULL); // client socket
-		if (cli_sock == -1) 
+		if (cli_sock == -1)
 		{
 			perror("cli_sock connect ACCEPT fail");
 			close(srv_sock);
@@ -163,9 +170,9 @@ static void * handle(void * arg)
 	memset(&peer_addr, 0, sizeof(peer_addr));
 	peer_addr_len = sizeof(peer_addr);
 	ret = getpeername(cli_sockfd, &peer_addr, &peer_addr_len);
-	ret = getnameinfo(&peer_addr, peer_addr_len, 
-			hbuf, sizeof(hbuf), sbuf, sizeof(sbuf), 
-			NI_NUMERICHOST | NI_NUMERICSERV); 
+	ret = getnameinfo(&peer_addr, peer_addr_len,
+			hbuf, sizeof(hbuf), sbuf, sizeof(sbuf),
+			NI_NUMERICHOST | NI_NUMERICSERV);
 
 	if (ret != 0) {
 		ret = -1;
@@ -188,7 +195,7 @@ static void * handle(void * arg)
 		if (len == 0) break;
 		printf("%s\n len:%d\n", recv_buffer, len);
 		memset(send_buffer, 0, sizeof(send_buffer));
-		sprintf(send_buffer, "[%s:%s]%s len:%d\n", 
+		sprintf(send_buffer, "[%s:%s]%s len:%d\n",
 				hbuf, sbuf, recv_buffer, len);
 		len = strlen(send_buffer);
 
@@ -203,4 +210,3 @@ static void * handle(void * arg)
 	ret = 0;
 	pthread_exit(&ret);
 }
-
