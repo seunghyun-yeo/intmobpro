@@ -49,3 +49,4 @@ static void * handle(void * arg);
 void print_p_table();
 void make_r_table(int s);
 void print_r_table();
+void make_legacy();

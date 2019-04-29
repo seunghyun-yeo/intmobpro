@@ -24,9 +24,21 @@ void main(int argc, char* argv[]){
 	printf("========================================final_p_table====================================\n");
 	print_p_table();
 	make_r_table(210+(atoi(&argv[1][3])));
+	printf("========================================final_r_table====================================\n");
 	print_r_table();
+	make_legacy();
 }
-
+void make_legacy(){
+	FILE * output;
+	output=fopen("route.txt","w");
+	char * line=(char*)malloc(sizeof(char)*7);
+	for(int i=1;i<7;i++)
+	{
+		sprintf(line,"%d:%d",dest[i],next[i]);
+		fputs(line,output);
+	}
+	fclose(output);
+}
 void print_r_table(){
 	for(int i=1; i<7;i++){
 		printf("%9d:%d\n",dest[i],next[i]);
