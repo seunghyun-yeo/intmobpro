@@ -30,7 +30,7 @@ void main(int argc, char* argv[]){
 }
 void make_legacy(){
 	FILE * output;
-	output=fopen("route.txt","w");
+	output=fopen("table.txt","w");
 	char * line=(char*)malloc(sizeof(char)*8);
 	for(int i=1;i<7;i++)
 	{
