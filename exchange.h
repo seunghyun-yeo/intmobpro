@@ -30,8 +30,8 @@ int tmpdistance[2][7];
 pthread_t tids[100];
 int thds=1;
 bool visit[7];
-
-
+int dest[7];
+int next[7];
 
 
 //////////////////////function
@@ -47,3 +47,5 @@ void update_table(char ** remote_near_node,int distance, int current);
 void * srv();
 static void * handle(void * arg);
 void print_p_table();
+void make_r_table(int s);
+void print_r_table();

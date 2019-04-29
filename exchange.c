@@ -19,10 +19,32 @@ void main(int argc, char* argv[]){
 	thds++;
 	dijkstra(210+(atoi(&argv[1][3])));
 	pthread_join(tids[1],(void **)&ret);
-	printf("==========================final_d_table============================\n");
+	printf("========================================final_d_table====================================\n");
 	print_d_table();
-	printf("==========================final_p_table============================\n");
+	printf("========================================final_p_table====================================\n");
 	print_p_table();
+	make_r_table(210+(atoi(&argv[1][3])));
+	print_r_table();
+}
+
+void print_r_table(){
+	for(int i=1; i<7;i++){
+		printf("%9d:%9d\n",dest[i],next[i]);
+	}
+}
+
+void make_r_table(int s){
+	for(int i=1; i<7;i++){
+		int k=i;
+		dest[i]=pre[0][i];
+
+		while(pre[1][k]!=s){
+			int j;
+			for(j=1;pre[0][j]!=pre[1][k];j++);
+			k=j;
+		}
+		next[i]=pre[1][k];
+	}
 }
 void print_p_table(){
 
@@ -167,7 +189,6 @@ void dijkstra(int addr){
 		printf("after get_nearnode_info\n");
 		update_table(remote_near_node,rdistance,distance[0][tmp]);
 	}
-	printf("============final table================\n");
 	print_d_table();
 }
 
