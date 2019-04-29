@@ -112,12 +112,12 @@ static void * handle(void * arg){
 		memset(send_buffer, 0, 1024);
 		//for(unsigned int y=0; y<timebuffer;y++);///time buffer
 		sprintf(send_buffer,"%s",near_node[k]);
-		send(cli_sockfd,send_buffer,1024,0);
+		send(cli_sockfd,send_buffer,strlen(send_buffer),0);
 		fsync(cli_sockfd);
-	fflush(NULL);
+		fflush(NULL);
 		recv(cli_sockfd,recv_buffer,sizeof(recv_buffer),0);
 		fsync(cli_sockfd);
-	fflush(NULL);
+		fflush(NULL);
 	}
 	close(cli_sockfd);
 	lret =0;
