@@ -29,21 +29,21 @@ void main(int argc, char* argv[]){
 
 void print_r_table(){
 	for(int i=1; i<7;i++){
-		printf("%9d:%9d\n",dest[i],next[i]);
+		printf("%9d:%d\n",dest[i],next[i]);
 	}
 }
 
 void make_r_table(int s){
 	for(int i=1; i<7;i++){
 		int k=i;
+		int j;
 		dest[i]=pre[0][i];
 
 		while(pre[1][k]!=s){
-			int j;
 			for(j=1;pre[0][j]!=pre[1][k];j++);
 			k=j;
 		}
-		next[i]=pre[1][k];
+		next[i]=pre[0][k];
 	}
 }
 void print_p_table(){
