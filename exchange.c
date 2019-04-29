@@ -110,8 +110,9 @@ static void * handle(void * arg){
 	fflush(NULL);
 	for(int k=1;k<near_node_sz;k++){
 		memset(send_buffer, 0, 1024);
-		for(unsigned int y=0; y<timebuffer;y++);///time buffer
-		send(cli_sockfd,near_node[k],strlen(near_node[k]),0);
+		//for(unsigned int y=0; y<timebuffer;y++);///time buffer
+		sprintf(send_buffer,"%s",near_node[k]);
+		send(cli_sockfd,send_buffer,1024,0);
 		fsync(cli_sockfd);
 	fflush(NULL);
 		recv(cli_sockfd,recv_buffer,sizeof(recv_buffer),0);
