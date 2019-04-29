@@ -10,7 +10,7 @@
 #include <pthread.h>
 #include <netdb.h>
 #include <fcntl.h>
-#define myself "220.149.244.212"
+#define myself "220.149.244.144"
 
 char inputbuffer[1024];
 pthread_t tids[100];
@@ -40,11 +40,11 @@ int main(int argc, char *argv[])
 	data = (char*)malloc(1024);
 
 	// arg parsing
-	if (argc != 3) {
-		printf("usage: cli srv_ip_addr port\n");
+	if (argc != 2) {
+		printf("usage: cli srv_ip_addr\n");
 		return 0;
 	}
-	port_num = 6628;
+	port_num = 6627;
 
 	// socket creation
 	fd_sock = socket(AF_INET, SOCK_STREAM, 0);
@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
 	addr.sin_port = htons (port_num);
 	inet_pton(AF_INET, myself, &addr.sin_addr);
 	ret=-1;
-	printf("try connect to %s:%s\n",argv[1],port_num);
+	printf("try connect to %s:%d\n",myself,port_num);
 	while(ret==-1)
 	{
 		ret = connect(fd_sock, (struct sockaddr *)&addr, sizeof(addr));
@@ -84,14 +84,14 @@ int main(int argc, char *argv[])
 			memset(buffer, 0, sizeof(buffer));
 			continue;
 		}
-		send(fd_sock,&len,sizeof(len),0);
+		//send(fd_sock,&len,sizeof(len),0);
 		send(fd_sock, buffer, len, 0);
 		strncpy(dst_ip, buffer, 15);
 		memset(buffer, 0, sizeof(buffer));
-		memset(r_buffer, 0, sizeof(r_buffer));
-		len = recv(fd_sock, r_buffer, sizeof(r_buffer), 0);
-		if (len < 0) break;
-		printf("server says $ %s\n", r_buffer);
+		//memset(r_buffer, 0, sizeof(r_buffer));
+		//len = recv(fd_sock, r_buffer, sizeof(r_buffer), 0);
+		//if (len < 0) break;
+		//printf("server says $ %s\n", r_buffer);
 		fflush(NULL);
 	}
 	// bye-bye
@@ -183,24 +183,24 @@ static void * handle(void * arg)
 	while (1) {
 		int len = 0;
 		int len2 = 0;
-		memset(recv_buffer, 0, sizeof(recv_buffer));
-		recv(cli_sockfd, &len, sizeof(len),0);
-		printf("%d\n",len);
-		while(len!=len2)
-		{
-			len2 += recv(cli_sockfd, recv_buffer+len2, sizeof(recv_buffer), 0);
-		}
+		memset(recv_buffer, 0, 1024);
+		//recv(cli_sockfd, &len, sizeof(len),0);
+		//printf("%d\n",len);
+		//while(len!=len2)
+		//{
+			len = recv(cli_sockfd, recv_buffer, 1024, 0);
+		//}
 		fsync(cli_sockfd);
 		printf("from client (%d)\n", len);
 		if (len == 0) break;
 		printf("%s\n len:%d\n", recv_buffer, len);
-		memset(send_buffer, 0, sizeof(send_buffer));
-		sprintf(send_buffer, "[%s:%s]%s len:%d\n",
-				hbuf, sbuf, recv_buffer, len);
-		len = strlen(send_buffer);
+		//memset(send_buffer, 0, sizeof(send_buffer));
+		//sprintf(send_buffer, "[%s:%s]%s len:%d\n",
+		//hbuf, sbuf, recv_buffer, len);
+		//len = strlen(send_buffer);
 
-		ret = send(cli_sockfd, send_buffer, len, 0);
-		if (ret == -1) break;
+		//ret = send(cli_sockfd, send_buffer, len, 0);
+		//if (ret == -1) break;
 		printf("----\n");
 		fflush(NULL);
 		fsync(cli_sockfd);

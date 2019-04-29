@@ -10,7 +10,7 @@
 #include <pthread.h>
 #include <netdb.h>
 #include <fcntl.h>
-#define myself "220.149.244.212"
+#define myself "220.149.244.144"
 
 char inputbuffer[1024];
 pthread_t tids[100];
